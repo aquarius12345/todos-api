@@ -4,6 +4,7 @@ const User = require('../models/User.js');
 
 const router = Router();
 
+//get all users Todos.
 router.get('/todos', async (req, res) => {
     try {
         const todos = await Todo.find();
@@ -13,18 +14,25 @@ router.get('/todos', async (req, res) => {
     }
 });
 
-// router.post('/todos', async (req, res) => {
-//     try {
-//         const newTodo = await Todo.create(req.body);
-//         res.status(201).json(newTodo);
-//     } catch(error) {
-//         res.status(500).json({ msg: 'Erro ao criar novo todo', error })
-//     }
-// })
+//get one user Todos.
+router.get('/todos-by-user', async (req, res) => {
+    const { id } = req.user;
+    console.log('user id', id)
+
+    try {
+        const todos = await User.findById( {_id: id}, 'todos' ).populate('todos');
+        res.status(200).json(todos);
+
+    } catch(error) {
+        res.status(500).json({ msg: 'Server error', error });
+    }
+})
+
 
 router.post('/todos', async (req, res) => {
     const { id } = req.user;
     console.log('this is id', id)
+    console.log(req.body);
 
     try {
         const newTodo = await Todo.create(req.body);
@@ -34,7 +42,7 @@ router.post('/todos', async (req, res) => {
         res.status(201).json(updateUserTodo);
 
     } catch(error) {
-        console.log(error)
+        //console.log(error)
         res.status(500).json({ msg: 'Erro ao criar novo todo', error })
     }
 })
